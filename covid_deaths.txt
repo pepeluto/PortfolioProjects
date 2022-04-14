@@ -1,5 +1,3 @@
-min 1.07.
-covid > deaths
 -- What was the death % in Spain? How many died of those who got covid?
 select location,total_cases,total_deaths,date,
 (cast(total_deaths as float)/cast(total_cases as float))*100 as deathPercentage
