@@ -1,0 +1,55 @@
+min 1.07.
+covid > deaths
+-- What was the death % in Spain? How many died of those who got covid?
+select location,total_cases,total_deaths,date,
+(cast(total_deaths as float)/cast(total_cases as float))*100 as deathPercentage
+from deaths
+where location ilike 'Spain'
+order by date desc;
+
+--Total cases vs. population. Which % of the population got covid at some point?
+select location,total_cases,population,date,
+(cast(total_cases as float)/cast(population as float))*100 as casesPercentage
+from deaths
+where location ilike 'Spain'
+order by date desc;*/
+
+--Countries with the highest deaths by covid
+select distinct location, max(total_deaths) as deaths_count
+from deaths
+where continent is not null
+group by location
+order by deaths_count;
+
+--clean data (there are some locations that are shown as Continents instead of countries)
+select * from deaths
+where continent is not null;--we can add this to all our queries to get more accurate results 
+
+--death count by continent
+select location, max(total_deaths) as total_death_count
+from deaths
+where continent is null
+group by location
+order by total_death_count desc;
+
+--daily worldwide deaths
+select date, sum(new_deaths) as daily_deaths
+from deaths
+group by date
+order by date desc;
+
+
+
+WITH PopVsVac as
+(
+select dea.continent,dea.location,dea.date,dea.population,vac.new_vaccinations,
+	sum(vac.new_vaccinations) as RollingPeopleVaccinated
+from deaths dea
+	join vaccinations vac
+	on dea.location = vac.location
+	and  dea.date = vac.date
+where dea.continent is not null and dea.location = 'Spain'
+	group by dea.continent, dea.location,dea.date,dea.population,vac.new_vaccinations
+
+)
+Select * , (RollingPeopleVaccinated/Population)*100 from PopVsVac;
