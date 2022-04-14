@@ -1,0 +1,13 @@
+create view PopVsVac as
+(
+select dea.continent,dea.location,dea.date,dea.population,vac.new_vaccinations,
+	sum(vac.new_vaccinations) as RollingPeopleVaccinated
+from deaths dea
+	join vaccinations vac
+	on dea.location = vac.location
+	and  dea.date = vac.date
+where dea.continent is not null and dea.location = 'Spain'
+	group by dea.continent, dea.location,dea.date,dea.population,vac.new_vaccinations
+
+);
+Select * , (RollingPeopleVaccinated/Population)*100 from PopVsVac;
